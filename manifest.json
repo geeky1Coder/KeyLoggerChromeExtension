@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "My Chrome Extension",
+  "version": "3.0",
+  "description": "A sample Chrome extension.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Click me!"
+  }
+}
